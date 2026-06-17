@@ -165,13 +165,13 @@ export async function generateQuotationPDF(data: QuotationData) {
   yPosition += 10;
   pdf.setFontSize(11);
   pdf.setFont(undefined as any, 'bold');
-  pdf.text(`Subtotal: ₹${data.subtotal.toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
+  pdf.text(`Subtotal: ₹${Number(data.subtotal).toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
   yPosition += 8;
-  pdf.text(`GST (18%): ₹${data.gstAmount.toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
+  pdf.text(`GST (18%): ₹${Number(data.gstAmount).toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
   yPosition += 10;
   pdf.setFontSize(14);
   pdf.setTextColor(37, 99, 235);
-  pdf.text(`TOTAL: ₹${data.finalTotal.toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
+  pdf.text(`TOTAL: ₹${Number(data.finalTotal).toFixed(2)}`, pageWidth - 20, yPosition, { align: 'right' });
 
   return pdf;
 }
