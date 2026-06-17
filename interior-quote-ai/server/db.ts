@@ -91,12 +91,28 @@ export async function getUserByOpenId(openId: string) {
 
 // Client queries
 export async function createClient(client: InsertClient): Promise<Client> {
-  const db = await getDb();
-  if (!db) throw new Error("Database not available");
-  const result = await db.insert(clients).values(client);
-  const id = result[0]?.insertId as number;
-  const created = await db.select().from(clients).where(eq(clients.id, id)).limit(1);
-  return created[0]!;
+  try {
+    const db = await getDb();
+
+    if (!db) {
+      throw new Error("Database not available");
+    }
+
+    const result = await db.insert(clients).values(client);
+
+    const id = result[0]?.insertId as number;
+
+    const created = await db
+      .select()
+      .from(clients)
+      .where(eq(clients.id, id))
+      .limit(1);
+
+    return created[0]!;
+  } catch (error) {
+    console.error("CREATE CLIENT DB ERROR:", error);
+    throw error;
+  }
 }
 
 export async function getClientById(id: number): Promise<Client | undefined> {
