@@ -29,14 +29,15 @@ export default function ClientForm() {
   );
 
   const createMutation = trpc.clients.create.useMutation({
-    onSuccess: () => {
-      toast.success("Client created successfully");
-      setLocation("/clients");
-    },
-    onError: () => {
-      toast.error("Failed to create client");
-    },
-  });
+  onSuccess: () => {
+    toast.success("Client created successfully");
+    setLocation("/clients");
+  },
+  onError: (error) => {
+    console.error("CREATE CLIENT ERROR:", error);
+    toast.error(String(error));
+  },
+});
 
   const updateMutation = trpc.clients.update.useMutation({
     onSuccess: () => {
