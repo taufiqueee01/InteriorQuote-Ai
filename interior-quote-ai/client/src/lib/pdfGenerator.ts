@@ -112,55 +112,63 @@ export async function generateQuotationPDF(data: QuotationData) {
     yPosition += 6;
   });
 
-  // Line Items Table
-  yPosition += 10;
-  pdf.setFontSize(12);
-  pdf.text('LINE ITEMS', 20, yPosition);
+// Line Items Table
+yPosition += 10;
+pdf.setFontSize(12);
+pdf.setTextColor(0, 0, 0);
+pdf.text('LINE ITEMS', 20, yPosition);
 
-  yPosition += 10;
-  const tableStartY = yPosition;
-  const colWidths = [80, 20, 25, 20, 25];
-  const headers = ['Item', 'Qty', 'Rate', 'GST%', 'Total'];
-  const rows = data.lineItems.map((item) => {
-    const total = item.quantity * item.rate - item.discount;
-    return [
-      item.itemName,
-      item.quantity.toString(),
-      `₹${item.rate}`,
-      `${item.gstPercentage}%`,
-      `₹${total.toFixed(2)}`,
-    ];
-  });
+yPosition += 10;
 
-  // Draw table header
-  pdf.setFillColor(37, 99, 235);
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(9);
-  let xPos = 20;
-  headers.forEach((header, i) => {
-    pdf.text(header, xPos + colWidths[i] / 2, yPosition, { align: 'center' });
-    xPos += colWidths[i];
-  });
+const tableRows = data.lineItems.map((item) => {
+  const total =
+    item.quantity * item.rate -
+    item.discount +
+    ((item.quantity * item.rate - item.discount) *
+      item.gstPercentage) /
+      100;
 
-  // Draw table rows
-  yPosition += 8;
-  pdf.setTextColor(0, 0, 0);
-  pdf.setFillColor(240, 240, 240);
-  rows.forEach((row, rowIndex) => {
-    if (yPosition > pageHeight - 40) {
-      pdf.addPage();
-      yPosition = 20;
-    }
-    xPos = 20;
-    row.forEach((cell, i) => {
-      if (rowIndex % 2 === 0) {
-        pdf.rect(xPos - 2, yPosition - 5, colWidths[i], 7, 'F');
-      }
-      pdf.text(cell, xPos + colWidths[i] / 2, yPosition, { align: 'center' });
-      xPos += colWidths[i];
-    });
-    yPosition += 8;
-  });
+  return [
+    item.itemName,
+    item.quantity.toString(),
+    `₹${item.rate.toLocaleString()}`,
+    `${item.gstPercentage}%`,
+    `₹${total.toFixed(2)}`,
+  ];
+});
+
+autoTable(pdf, {
+  startY: yPosition,
+  head: [['Item', 'Qty', 'Rate', 'GST', 'Total']],
+  body: tableRows,
+  theme: 'grid',
+
+  headStyles: {
+    fillColor: [37, 99, 235],
+    textColor: 255,
+    fontStyle: 'bold',
+  },
+
+  alternateRowStyles: {
+    fillColor: [245, 247, 250],
+  },
+
+  styles: {
+    fontSize: 9,
+    cellPadding: 3,
+  },
+
+  columnStyles: {
+    0: { cellWidth: 70 },
+    1: { halign: 'center' },
+    2: { halign: 'right' },
+    3: { halign: 'center' },
+    4: { halign: 'right' },
+  },
+});
+
+yPosition = (pdf as any).lastAutoTable.finalY + 10;
+pdf.setTextColor(0, 0, 0);
 
   // Totals
   yPosition += 10;
