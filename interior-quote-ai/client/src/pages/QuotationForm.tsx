@@ -159,6 +159,8 @@ export default function QuotationForm() {
     if (quotationId) {
       updateMutation.mutate({ id: quotationId, ...data });
     } else {
+      console.log("LINE ITEMS =", lineItems);
+      console.log("DATA =", data);
       createMutation.mutate(data);
     }
   };
